@@ -1,0 +1,14 @@
+name: watchtower_client
+description: Client Dart officiel pour l'API REST Watchtower. Supporte les deux modes serveur (embarqué shelf et headless Node.js).
+version: 0.1.0
+homepage: https://github.com/ferelking242/watchtower-sdk-dart
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  http: ">=1.0.0 <2.0.0"
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
