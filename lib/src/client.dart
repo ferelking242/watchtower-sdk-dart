@@ -74,6 +74,21 @@ class WatchtowerClient {
     }
   }
 
+  /// Effectue une requête GET brute et retourne le JSON décodé non-typé.
+  ///
+  /// Utile quand le client a besoin de la réponse brute du serveur tout en
+  /// bénéficiant du retry exponentiel et de l'injection automatique du header auth.
+  ///
+  /// ```dart
+  /// final data = await client.getRaw('/api/sources/redgifs/popular', queryParams: {'page': '2'});
+  /// final items = data['list'] ?? data['items'] ?? [];
+  /// ```
+  Future<Map<String, dynamic>> getRaw(
+    String path, {
+    Map<String, String?> queryParams = const {},
+  }) =>
+      _http.get(path, queryParams: queryParams);
+
   /// Libère les ressources du client HTTP sous-jacent.
   ///
   /// À appeler quand le client n'est plus utilisé (fin d'app, tearDown de test…).

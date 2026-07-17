@@ -16,6 +16,7 @@
 library watchtower_client;
 
 export 'src/client.dart' show WatchtowerClient;
+export 'src/http_client.dart' show WatchtowerHttpClient;
 export 'src/exceptions.dart'
     show WatchtowerException, WatchtowerNetworkException, WatchtowerApiException;
 export 'src/models/source.dart' show Source, ItemType;
