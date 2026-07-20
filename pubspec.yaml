@@ -1,7 +1,19 @@
 name: watchtower_client
-description: Client Dart officiel pour l'API REST Watchtower. Supporte les deux modes serveur (embarqué shelf et headless Node.js).
-version: 0.1.0
+description: >-
+  Official Dart/Flutter client for the Watchtower REST API.
+  Supports both embedded Dart/shelf and headless Node.js server modes.
+  Auto-retry, typed models, pagination helpers, full null-safety.
+version: 1.0.0
 homepage: https://github.com/ferelking242/watchtower-sdk-dart
+repository: https://github.com/ferelking242/watchtower-sdk-dart
+issue_tracker: https://github.com/ferelking242/watchtower-sdk-dart/issues
+
+topics:
+  - watchtower
+  - api-client
+  - http
+  - media
+  - anime
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -12,3 +24,5 @@ dependencies:
 dev_dependencies:
   lints: ^3.0.0
   test: ^1.24.0
+  mockito: ^5.4.4
+  build_runner: ^2.4.9

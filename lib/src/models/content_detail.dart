@@ -1,14 +1,23 @@
-/// Chapitre de manga ou épisode d'anime.
+/// Chapitre (manga/novel) ou épisode (anime).
 class Chapter {
+  /// URL du chapitre ou de l'épisode (utilisée pour pages/videos).
   final String url;
-  final String? name;
+
+  /// Titre ou numéro.
+  final String name;
+
+  /// Date de mise en ligne (timestamp ms ou string ISO).
   final String? dateUpload;
+
+  /// Numéro de chapitre/épisode.
   final double? chapterNumber;
+
+  /// Groupe de scanlation ou sous-titrage.
   final String? scanlator;
 
   const Chapter({
     required this.url,
-    this.name,
+    required this.name,
     this.dateUpload,
     this.chapterNumber,
     this.scanlator,
@@ -16,7 +25,7 @@ class Chapter {
 
   factory Chapter.fromJson(Map<String, dynamic> json) => Chapter(
         url: (json['url'] ?? '') as String,
-        name: json['name'] as String?,
+        name: (json['name'] ?? '') as String,
         dateUpload: json['dateUpload']?.toString(),
         chapterNumber: (json['chapterNumber'] as num?)?.toDouble(),
         scanlator: json['scanlator'] as String?,
@@ -24,62 +33,94 @@ class Chapter {
 
   Map<String, dynamic> toJson() => {
         'url': url,
-        if (name != null) 'name': name,
+        'name': name,
         if (dateUpload != null) 'dateUpload': dateUpload,
         if (chapterNumber != null) 'chapterNumber': chapterNumber,
         if (scanlator != null) 'scanlator': scanlator,
       };
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Chapter && other.url == url;
+
+  @override
+  int get hashCode => url.hashCode;
+
+  @override
   String toString() => 'Chapter(name: $name, url: $url)';
 }
 
-/// Détail complet d'un contenu (manga ou anime) avec ses chapitres/épisodes.
+/// Détail complet d'un contenu — manga, anime, novel ou musique.
 class ContentDetail {
-  final String? name;
-  final String? description;
-  final String? imageUrl;
-  final String? author;
-  final String? status;
-  final List<String> genres;
+  /// Titre du contenu.
+  final String name;
 
-  /// Chapitres (manga/novel).
+  /// Description.
+  final String? description;
+
+  /// URL de la couverture.
+  final String? imageUrl;
+
+  /// Auteur ou studio.
+  final String? author;
+
+  /// Statut (ex: `Completed`, `Ongoing`).
+  final String? status;
+
+  /// Liste des genres.
+  final List<String> genre;
+
+  /// Chapitres (manga/novel). Vide pour les sources vidéo.
   final List<Chapter> chapters;
 
-  /// Épisodes (anime/vidéo) — même structure que chapters.
+  /// Épisodes (anime/vidéo). Vide pour les sources manga.
   final List<Chapter> episodes;
 
   const ContentDetail({
-    this.name,
+    required this.name,
     this.description,
     this.imageUrl,
     this.author,
     this.status,
-    this.genres = const [],
+    this.genre = const [],
     this.chapters = const [],
     this.episodes = const [],
   });
 
-  factory ContentDetail.fromJson(Map<String, dynamic> json) {
-    List<Chapter> parseChapters(dynamic raw) =>
-        (raw as List<dynamic>? ?? [])
+  /// `true` si le contenu est de type vidéo/anime (a des épisodes).
+  bool get isVideo => episodes.isNotEmpty;
+
+  /// `true` si le contenu est de type manga/novel (a des chapitres).
+  bool get isManga => chapters.isNotEmpty;
+
+  /// Tous les "chapitres" — fusionné pour un accès générique.
+  List<Chapter> get allChapters => isVideo ? episodes : chapters;
+
+  factory ContentDetail.fromJson(Map<String, dynamic> json) => ContentDetail(
+        name: (json['name'] ?? '') as String,
+        description: json['description'] as String?,
+        imageUrl: json['imageUrl'] as String?,
+        author: json['author'] as String?,
+        status: json['status'] as String?,
+        genre: (json['genre'] as List<dynamic>?)?.cast<String>() ?? const [],
+        chapters: ((json['chapters'] as List<dynamic>?) ?? [])
             .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
-            .toList();
+            .toList(),
+        episodes: ((json['episodes'] as List<dynamic>?) ?? [])
+            .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 
-    return ContentDetail(
-      name: json['name'] as String?,
-      description: json['description'] as String?,
-      imageUrl: (json['imageUrl'] ?? json['thumbnailUrl']) as String?,
-      author: json['author'] as String?,
-      status: json['status'] as String?,
-      genres: (json['genre'] as List<dynamic>?)?.cast<String>() ?? [],
-      chapters: parseChapters(json['chapters']),
-      episodes: parseChapters(json['episodes']),
-    );
-  }
-
-  /// Retourne episodes si présents, sinon chapters (utile pour les sources mixtes).
-  List<Chapter> get allEpisodes => episodes.isNotEmpty ? episodes : chapters;
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        if (description != null) 'description': description,
+        if (imageUrl != null) 'imageUrl': imageUrl,
+        if (author != null) 'author': author,
+        if (status != null) 'status': status,
+        if (genre.isNotEmpty) 'genre': genre,
+        if (chapters.isNotEmpty) 'chapters': chapters.map((e) => e.toJson()).toList(),
+        if (episodes.isNotEmpty) 'episodes': episodes.map((e) => e.toJson()).toList(),
+      };
 
   @override
   String toString() =>

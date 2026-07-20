@@ -1,9 +1,5 @@
 .dart_tool/
-.packages
-pubspec.lock
 build/
-doc/api/
+pubspec.lock
 *.iml
-.idea/
-.vscode/
-coverage/
+.packages
