@@ -21,12 +21,16 @@ enum ItemType {
       ItemType.values.firstWhere((e) => e.value == v, orElse: () => ItemType.manga);
 
   /// Accepts the numeric value the server documents (`2`), the enum name the
-  /// server actually sends (`"video"`) and numeric strings (`"2"`).
+  /// server actually sends (`"anime"`, `"video"`) and numeric strings (`"2"`).
   static ItemType fromJson(Object? raw) {
     if (raw is String) {
-      final byName = ItemType.values.where((e) => e.name == raw);
+      final name = raw.trim().toLowerCase();
+      final byName = ItemType.values.where((e) => e.name == name);
       if (byName.isNotEmpty) return byName.first;
-      return fromInt(int.tryParse(raw.trim()));
+      // The server enum is manga/anime/novel/music/game/plugin: `anime` is
+      // this API's `video`, the rest has no client-side equivalent.
+      if (name == 'anime') return ItemType.video;
+      return fromInt(int.tryParse(name));
     }
     if (raw is num) return fromInt(raw.toInt());
     return ItemType.manga;

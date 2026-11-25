@@ -26,6 +26,17 @@ void main() {
       expect(source.isManga, isFalse);
     });
 
+    test('maps the server enum name "anime" to video', () {
+      expect(
+        Source.fromJson({'id': 1, 'itemType': 'anime'}).itemType,
+        ItemType.video,
+      );
+      expect(
+        Source.fromJson({'id': 1, 'itemType': 'ANIME'}).itemType,
+        ItemType.video,
+      );
+    });
+
     test('accepts numeric item types and numeric strings', () {
       expect(
         Source.fromJson({'id': 1, 'itemType': 2}).itemType,
