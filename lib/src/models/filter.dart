@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Filtre de recherche avancée retourné par `/filters`.
 ///
 /// La structure exacte varie selon l'extension (SelectFilter, TextFilter, etc.)
@@ -16,10 +18,10 @@ class Filter {
   });
 
   factory Filter.fromJson(Map<String, dynamic> json) => Filter(
-        type: json['type'] as String?,
-        name: json['name'] as String?,
+        type: coerceStringOrNull(json['type']),
+        name: coerceStringOrNull(json['name']),
         value: json['value'],
-        options: (json['options'] as List<dynamic>?)?.cast<String>() ?? [],
+        options: coerceStringList(json['options']),
       );
 
   Map<String, dynamic> toJson() => {

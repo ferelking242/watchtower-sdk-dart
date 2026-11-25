@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Page d'un chapitre manga retournée par `/pages`.
 class MangaPage {
   /// Index de la page (commence à 0).
@@ -16,13 +18,9 @@ class MangaPage {
   });
 
   factory MangaPage.fromJson(Map<String, dynamic> json) => MangaPage(
-        page: (json['page'] as num?)?.toInt() ?? 0,
-        url: (json['url'] ?? json['imageUrl'] ?? '') as String,
-        headers: Map<String, String>.from(
-          (json['headers'] as Map<String, dynamic>? ?? {}).map(
-            (k, v) => MapEntry(k, v.toString()),
-          ),
-        ),
+        page: coerceInt(json['page']),
+        url: coerceString(json['url'] ?? json['imageUrl']),
+        headers: coerceStringMap(json['headers']),
       );
 
   Map<String, dynamic> toJson() => {

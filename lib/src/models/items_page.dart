@@ -1,3 +1,4 @@
+import 'coerce.dart';
 import 'feed_item.dart';
 
 /// Page de résultats (popular / latest / search).
@@ -8,10 +9,10 @@ class ItemsPage {
   const ItemsPage({required this.items, required this.hasNextPage});
 
   factory ItemsPage.fromJson(Map<String, dynamic> json) => ItemsPage(
-        items: ((json['mangas'] ?? json['items']) as List<dynamic>? ?? [])
-            .map((e) => FeedItem.fromJson(e as Map<String, dynamic>))
+        items: coerceMapList(json['mangas'] ?? json['items'] ?? json['list'])
+            .map(FeedItem.fromJson)
             .toList(),
-        hasNextPage: (json['hasNextPage'] as bool?) ?? false,
+        hasNextPage: coerceBool(json['hasNextPage']),
       );
 
   bool get isEmpty => items.isEmpty;

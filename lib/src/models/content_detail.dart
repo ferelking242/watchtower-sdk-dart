@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Chapitre (manga/novel) ou épisode (anime).
 class Chapter {
   /// URL du chapitre ou de l'épisode (utilisée pour pages/videos).
@@ -24,11 +26,11 @@ class Chapter {
   });
 
   factory Chapter.fromJson(Map<String, dynamic> json) => Chapter(
-        url: (json['url'] ?? '') as String,
-        name: (json['name'] ?? '') as String,
-        dateUpload: json['dateUpload']?.toString(),
-        chapterNumber: (json['chapterNumber'] as num?)?.toDouble(),
-        scanlator: json['scanlator'] as String?,
+        url: coerceString(json['url']),
+        name: coerceString(json['name'] ?? json['chapterName']),
+        dateUpload: coerceStringOrNull(json['dateUpload']),
+        chapterNumber: coerceDoubleOrNull(json['chapterNumber']),
+        scanlator: coerceStringOrNull(json['scanlator']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -97,18 +99,14 @@ class ContentDetail {
   List<Chapter> get allChapters => isVideo ? episodes : chapters;
 
   factory ContentDetail.fromJson(Map<String, dynamic> json) => ContentDetail(
-        name: (json['name'] ?? '') as String,
-        description: json['description'] as String?,
-        imageUrl: json['imageUrl'] as String?,
-        author: json['author'] as String?,
-        status: json['status'] as String?,
-        genre: (json['genre'] as List<dynamic>?)?.cast<String>() ?? const [],
-        chapters: ((json['chapters'] as List<dynamic>?) ?? [])
-            .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        episodes: ((json['episodes'] as List<dynamic>?) ?? [])
-            .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
-            .toList(),
+        name: coerceString(json['name'] ?? json['title']),
+        description: coerceStringOrNull(json['description']),
+        imageUrl: coerceStringOrNull(json['imageUrl']),
+        author: coerceStringOrNull(json['author']),
+        status: coerceStringOrNull(json['status']),
+        genre: coerceStringList(json['genre']),
+        chapters: coerceMapList(json['chapters']).map(Chapter.fromJson).toList(),
+        episodes: coerceMapList(json['episodes']).map(Chapter.fromJson).toList(),
       );
 
   Map<String, dynamic> toJson() => {

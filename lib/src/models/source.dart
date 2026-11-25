@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Type de contenu exposé par une source.
 enum ItemType {
   /// Manga / bande dessinée (itemType = 0)
@@ -17,6 +19,18 @@ enum ItemType {
 
   static ItemType fromInt(int? v) =>
       ItemType.values.firstWhere((e) => e.value == v, orElse: () => ItemType.manga);
+
+  /// Accepts the numeric value the server documents (`2`), the enum name the
+  /// server actually sends (`"video"`) and numeric strings (`"2"`).
+  static ItemType fromJson(Object? raw) {
+    if (raw is String) {
+      final byName = ItemType.values.where((e) => e.name == raw);
+      if (byName.isNotEmpty) return byName.first;
+      return fromInt(int.tryParse(raw.trim()));
+    }
+    if (raw is num) return fromInt(raw.toInt());
+    return ItemType.manga;
+  }
 }
 
 /// Source d'extensions disponible sur le serveur Watchtower.
@@ -68,19 +82,23 @@ class Source {
     this.supportsLatest = true,
   });
 
-  factory Source.fromJson(Map<String, dynamic> json) => Source(
-        id: (json['id'] ?? '') as String,
-        name: (json['name'] ?? '') as String,
-        lang: (json['lang'] ?? '') as String,
-        baseUrl: json['baseUrl'] as String?,
-        sourceCodeUrl: json['sourceCodeUrl'] as String?,
-        iconUrl: json['iconUrl'] as String?,
-        isNsfw: (json['isNsfw'] as bool?) ?? false,
-        itemType: ItemType.fromInt(json['itemType'] as int?),
-        isManga: (json['isManga'] as bool?) ?? false,
-        version: json['version'] as String?,
-        supportsLatest: (json['supportsLatest'] as bool?) ?? true,
-      );
+  factory Source.fromJson(Map<String, dynamic> json) {
+    final itemType = ItemType.fromJson(json['itemType']);
+    return Source(
+      // The server serialises the Isar id, which is an int.
+      id: coerceString(json['id']),
+      name: coerceString(json['name']),
+      lang: coerceString(json['lang']),
+      baseUrl: coerceStringOrNull(json['baseUrl']),
+      sourceCodeUrl: coerceStringOrNull(json['sourceCodeUrl']),
+      iconUrl: coerceStringOrNull(json['iconUrl']),
+      isNsfw: coerceBool(json['isNsfw']),
+      itemType: itemType,
+      isManga: coerceBool(json['isManga'], itemType == ItemType.manga),
+      version: coerceStringOrNull(json['version']),
+      supportsLatest: coerceBool(json['supportsLatest'], true),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

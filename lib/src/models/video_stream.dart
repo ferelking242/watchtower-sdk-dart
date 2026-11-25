@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Stream vidéo retourné par `/videos`.
 class VideoStream {
   /// URL directe du stream (HLS m3u8, MP4, DASH mpd…).
@@ -21,15 +23,11 @@ class VideoStream {
   });
 
   factory VideoStream.fromJson(Map<String, dynamic> json) => VideoStream(
-        url: (json['url'] ?? '') as String,
-        quality: (json['quality'] ?? '') as String,
-        headers: Map<String, String>.from(
-          (json['headers'] as Map<String, dynamic>? ?? {}).map(
-            (k, v) => MapEntry(k, v.toString()),
-          ),
-        ),
-        isM3U8: (json['isM3U8'] as bool?) ?? false,
-        isMPD: (json['isMPD'] as bool?) ?? false,
+        url: coerceString(json['url']),
+        quality: coerceString(json['quality']),
+        headers: coerceStringMap(json['headers']),
+        isM3U8: coerceBool(json['isM3U8']),
+        isMPD: coerceBool(json['isMPD']),
       );
 
   Map<String, dynamic> toJson() => {

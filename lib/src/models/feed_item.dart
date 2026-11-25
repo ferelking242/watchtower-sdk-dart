@@ -1,3 +1,5 @@
+import 'coerce.dart';
+
 /// Élément retourné dans les listes popular / latest / search.
 class FeedItem {
   /// URL de la page de détail (utilisée pour [SourcesEndpoint.detail]).
@@ -32,13 +34,13 @@ class FeedItem {
   });
 
   factory FeedItem.fromJson(Map<String, dynamic> json) => FeedItem(
-        link: (json['link'] ?? json['url'] ?? '') as String,
-        name: (json['name'] ?? json['title'] ?? '') as String,
-        imageUrl: json['imageUrl'] as String?,
-        author: json['author'] as String?,
-        description: json['description'] as String?,
-        genre: (json['genre'] as List<dynamic>?)?.cast<String>() ?? const [],
-        status: json['status'] as String?,
+        link: coerceString(json['link'] ?? json['url']),
+        name: coerceString(json['name'] ?? json['title']),
+        imageUrl: coerceStringOrNull(json['imageUrl']),
+        author: coerceStringOrNull(json['author']),
+        description: coerceStringOrNull(json['description']),
+        genre: coerceStringList(json['genre']),
+        status: coerceStringOrNull(json['status']),
       );
 
   Map<String, dynamic> toJson() => {
